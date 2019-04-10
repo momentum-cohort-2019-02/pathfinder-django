@@ -216,7 +216,7 @@ class PathFinder:
         x = 0
         for route in self.map_data.data:
             temp_path = []
-            start = (route[50], x, 0)
+            start = (route[len(route) // 2], x, 0)
             route_effort = self.find_path(start, temp_path)
 
             if route_effort[0] < path_with_least_change[0]:

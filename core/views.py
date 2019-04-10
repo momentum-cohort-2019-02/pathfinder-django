@@ -24,6 +24,7 @@ def index_view(request):
             output = BytesIO()
             map_image.draw_image()
             map_image.draw_path()
+            map_image.canvas.save(output, format='PNG')
 
             image_data = output.getvalue()
             image_data_url = 'data:image/png;base64,' + base64.b64encode(

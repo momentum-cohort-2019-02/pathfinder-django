@@ -5,29 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
-  <style type="text/css">
-  main {
-    max-width: 38rem;
-    padding: 2rem;
-    margin: auto;
-    font-family: sans-serif;
-  }
-  </style>
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
 </head>
-<body>
-  <main>
+<body class="sans-serif">
+  <main class="mw9 center">
   <h1>Pathfinder</h1>
 
-  <form action="" method="POST" enctype="multipart/form-data">
+  <form action="" method="POST" enctype="multipart/form-data" class="mv3" id="pathfinder-form">
     {% csrf_token %}
     {{ form.as_p }}
 
     <button type="submit">Generate map</button>
   </form>
 
-  {% if image_url %}
-  <img src="{{ image_url }}">
-  {% endif %}
+  <div class="mw-100" id="map"></div>
+
   </main>
+  <script>
+    // when the submit button is clicked
+    document.querySelector("#pathfinder-form").addEventListener('submit', function (event) {
+      event.preventDefault()
+      generateMapImage()
+    })
+
+
+    function generateMapImage() {
+      // get the file from the file upload input
+      const map = document.querySelector("#map")
+      map.innerHTML = '<img src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/0.16.1/images/loader-large.gif">'
+
+      const fileInput = document.querySelector("#id_elevation_file")
+      const file = fileInput.files[0]
+      
+      // read that file as text
+      const reader = new FileReader()
+      reader.addEventListener('load', function (event) {
+        const elevationData = event.target.result
+        callApiWithElevationData(elevationData).then(function (responseData) {
+          console.log("ok")
+          const dataUrl = responseData.data_url
+          map.innerHTML = `<img src="${dataUrl}">`
+        })
+      })
+      reader.readAsText(file)
+    }
+
+    function callApiWithElevationData(elevationData) {
+      console.log(elevationData)
+
+      return fetch('/api/pathfinder/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "elevation_data": elevationData, 
+          "show_path": document.querySelector("#id_show_path").checked
+        })
+      }).then(response => response.json())      
+
+      // send an AJAX request to /api/pathfinder with that text
+      // when we get the response, add an image to the page with src of the data_url
+      // that we get back
+    }
+    
+    
+  </script>
 </body>
 </html>

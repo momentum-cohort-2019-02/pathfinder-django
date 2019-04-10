@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from core import views as core_views
+from core import api_views
 
 urlpatterns = [
     path('', core_views.index_view),
     path('admin/', admin.site.urls),
+    path('api/pathfinder/', api_views.ElevationMapView.as_view())
 ]
